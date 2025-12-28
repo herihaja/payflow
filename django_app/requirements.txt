@@ -1,0 +1,10 @@
+# Minimal requirements for a Django app using PostgreSQL
+Django>=4.2,<5.0
+gunicorn>=20.1.0
+psycopg2-binary>=2.9
+python-dotenv>=1.0
+whitenoise>=6.0
+# Optional helpers (uncomment if you use them)
+# dj-database-url>=1.2
+# django-environ>=0.8
+# requests>=2.30

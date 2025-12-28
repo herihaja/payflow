@@ -1,0 +1,29 @@
+# django_app/Dockerfile.prod (production)
+FROM python:3.11-slim
+
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+ENV WSGI_MODULE="payflow.wsgi"
+
+# Install system deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install python dependencies
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+# Copy project
+COPY . /app/
+
+# Create non-root user and set ownership
+RUN adduser --disabled-password --gecos '' django && chown -R django:django /app
+USER django
+
+EXPOSE 8000
+
+ENTRYPOINT ["./entrypoint.sh"]
+CMD ["sh", "-c", "gunicorn ${WSGI_MODULE}:application --bind 0.0.0.0:${DJANGO_PORT:-8000} --workers=3"]

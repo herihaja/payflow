@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - django_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+  django:
+    build:
+      context: ./django_app
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG:-0}
+      ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+    volumes:
+      - ./django_app:/app
+    ports:
+      - "${DJANGO_PORT:-8000}:8000"
+  react_app:
+    build:
+      context: ./react_app
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    volumes:
+      - ./react_app:/app/react_app
+    ports:
+      - "${REACT_PORT:-3000}:3000"
+    depends_on:
+      - db
+      - django
+
+volumes:
+  django_data:
