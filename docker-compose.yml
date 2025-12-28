@@ -32,6 +32,31 @@ services:
       - ./django_app:/app
     ports:
       - "${DJANGO_PORT:-8000}:8000"
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+  worker:
+    build:
+      context: ./django_app
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env
+    environment:
+      DB_HOST: ${DB_HOST:-db}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG:-0}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL:-redis://redis:6379/0}
+    volumes:
+      - ./django_app:/app
+    command: celery -A payflow worker --loglevel=info --concurrency=1
   react_app:
     build:
       context: ./react_app
@@ -48,3 +73,4 @@ services:
 
 volumes:
   django_data:
+  redis_data:

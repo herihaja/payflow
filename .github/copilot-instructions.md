@@ -36,10 +36,10 @@ Key discoverable patterns & gotchas
 
 Files to inspect for feature work or troubleshooting
 
-- `docker-compose.yml` (service wiring and ports)
-- `.env.example` (all env variables used in dev)
+- `docker-compose.yml` (service wiring and ports) — note: Redis and a `worker` service have been added for Celery
+- `.env.example` (all env variables used in dev) — add `CELERY_BROKER_URL`/`CELERY_RESULT_BACKEND` if you want non-default values
 - `django_app/entrypoint.sh`, `django_app/Dockerfile`, `django_app/Dockerfile.prod`
-- `django_app/payflow/settings.py` (env loading and DB configuration)
+- `django_app/payflow/settings.py` (env loading and DB configuration) — also contains `CELERY_*` settings and `django_celery_results` configuration
 - `react_app/package.json`, `react_app/Dockerfile`, `react_app/src/` (frontend)
 
 When you see failures
@@ -55,6 +55,14 @@ Examples of high-value changes to request (for future PRs)
 - Add a brief `README.md` at root describing local dev workflow (this file is minimal and intended for agent use only).
 
 If anything in this sheet is unclear or you want more detail (examples of git commands, preferred commit messages, or conventions for adding endpoints and components), tell me which area to expand and I will iterate.
+
+Batch upload API (added):
+
+- POST `/api/batches/` — multipart form upload with a single Excel file in `file`; processing auto-starts on upload.
+- GET `/api/batches/<id>/` — get batch meta and status (summary and items).
+- GET `/api/batches/<id>/items/` — list per-row items with their status and result messages.
+
+The per-row processing is queued to Celery (broker: Redis). For now the USSD/modem call is mocked in `batch.tasks.process_batch_item`.
 
 ---
 
