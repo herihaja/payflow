@@ -22,6 +22,7 @@ Useful commands
 Notes for contributors
 
 - Agent guidance: See `.github/copilot-instructions.md` for concise, project-specific notes aimed at AI coding agents and contributors.
+- Background jobs: The project uses Celery + Redis for background processing of batch items. Redis and a `worker` service are defined in `docker-compose.yml`; to run the worker locally use `docker-compose up --build worker` (or `docker-compose up --build` to start all services). The batch upload API auto-starts processing of rows on upload.
 - Static files: `STATIC_ROOT` is set to `staticfiles` in `django_app/payflow/settings.py` — in production configure a persistent `STATIC_ROOT` or a remote store.
 - Database: By default the project prefers Postgres if `DB_NAME` is set in `.env`. If Postgres is not configured, the project falls back to SQLite.
 
