@@ -74,13 +74,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: npm
+          cache-dependency-path: react_app/package-lock.json
 
       - name: Install dependencies and build
         working-directory: react_app
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install --include=optional
           npm run build
