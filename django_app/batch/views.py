@@ -4,7 +4,7 @@ import logging
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
 from openpyxl import load_workbook
 from django.db import transaction
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class BatchUploadCreateView(APIView):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, format=None):
         serializer = BatchUploadCreateSerializer(data=request.data)
@@ -29,7 +29,7 @@ class BatchUploadCreateView(APIView):
             original_filename=getattr(file_obj, 'name', ''),
             file=file_obj,
             status=BatchUpload.STATUS_PROCESSING,
-            uploaded_by=request.user if request.user.is_authenticated else None,
+            uploaded_by=request.user,
         )
 
         # Parse Excel and create items

@@ -57,20 +57,62 @@ services:
     volumes:
       - ./django_app:/app
     command: celery -A payflow worker --loglevel=info --concurrency=1
+  soketi:
+    image: "quay.io/soketi/soketi:latest-16-alpine"
+    restart: unless-stopped
+    environment:
+      SOKETI_REDIS_HOST: redis
+      SOKETI_REDIS_PORT: 6379
+      SOKETI_APP_ID: ${SOKETI_APP_ID}
+      SOKETI_APP_KEY: ${SOKETI_APP_KEY}
+      SOKETI_APP_SECRET: ${SOKETI_APP_SECRET}
+      SOKETI_WS_ENABLED: "true"
+      SOKETI_HOST: 0.0.0.0
+      SOKETI_CORS: "*"
+      SOKETI_DEBUG: 1
+      SOKETI_ENABLE_API: "true"
+      SOKETI_DEFAULT_APP_ID: ${SOKETI_APP_ID}
+      SOKETI_DEFAULT_APP_KEY: ${SOKETI_APP_KEY}
+      SOKETI_DEFAULT_APP_SECRET: ${SOKETI_APP_SECRET}
+      SOKETI_APPS: >-
+        [{"id": ${SOKETI_APP_ID}, "key": "${SOKETI_APP_KEY}", "secret": "${SOKETI_APP_SECRET}"}]
+
+    ports:
+      - "6001:6001"
+      - "9601:9601"
+    command:
+      [
+        "node",
+        "/app/bin/server.js",
+        "start",
+        "--config=/etc/soketi/config.json",
+        "--debug",
+      ]
+    volumes:
+      - ./soketi/config.json:/etc/soketi/config.json:ro
+
+    depends_on:
+      - redis
+
   react_app:
     build:
       context: ./react_app
       dockerfile: Dockerfile
     env_file:
       - .env
+    environment:
+      - VITE_WS_URL=http://soketi:6001
     volumes:
-      - ./react_app:/app/react_app
+      - ./react_app:/app
+      - react_node_modules:/app/node_modules
     ports:
       - "${REACT_PORT:-3000}:3000"
     depends_on:
       - db
       - django
+      - soketi
 
 volumes:
   django_data:
   redis_data:
+  react_node_modules:

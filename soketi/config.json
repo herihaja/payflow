@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "id": "65231",
+      "key": "devkey",
+      "secret": "devsecret"
+    }
+  ]
+}
