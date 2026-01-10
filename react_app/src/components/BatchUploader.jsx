@@ -79,80 +79,146 @@ export default function BatchUploader() {
   };
 
   return (
-    <div
-      style={{
-        marginTop: 20,
-        border: "2px dashed #f0ad4e",
-        padding: 16,
-        borderRadius: 8,
-        maxWidth: 560,
-        background: "#fffef7",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h2 style={{ marginTop: 0 }}>Batch Uploader</h2>
-        <span
-          style={{
-            background: "#ff4d4f",
-            color: "#fff",
-            padding: "4px 8px",
-            borderRadius: 6,
-            fontSize: 12,
-          }}
-        >
+    <div className="mt-8 card p-6 sm:p-8 max-w-3xl border-2 border-dashed border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 animate-fade-in">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-poppins font-bold text-gray-900 flex items-center gap-2">
+            <svg
+              className="w-8 h-8 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
+            </svg>
+            Batch Uploader
+          </h2>
+        </div>
+        <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
           DEBUG
         </span>
       </div>
 
-      <p style={{ marginTop: 4, color: "#666" }}>
+      <p className="text-gray-700 text-sm mb-6 leading-relaxed">
         Select an Excel file to upload batches. This will POST a multipart form
-        as <code>file</code> to <code>/api/batches/</code> and auto-start
-        processing.
+        as{" "}
+        <code className="bg-gray-200 px-2 py-1 rounded font-mono text-xs text-gray-800">
+          file
+        </code>{" "}
+        to{" "}
+        <code className="bg-gray-200 px-2 py-1 rounded font-mono text-xs text-gray-800">
+          /api/batches/
+        </code>{" "}
+        and auto-start processing.
       </p>
 
-      <div
-        style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".xlsx,.xls"
-          onChange={handleFileChange}
-        />
+      <div className="space-y-4">
+        <div className="input-group">
+          <label
+            htmlFor="file-upload"
+            className="text-sm font-semibold text-gray-700"
+          >
+            Excel File
+          </label>
+          <input
+            id="file-upload"
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileChange}
+          />
+        </div>
+
         <button
           onClick={handleUpload}
           disabled={uploading}
-          style={{
-            padding: "6px 12px",
-            background: "#0069d9",
-            color: "#fff",
-            border: "none",
-            borderRadius: 4,
-            cursor: "pointer",
-          }}
+          className="w-full gradient-button-success"
         >
-          {uploading ? "Uploading..." : "Upload"}
+          {uploading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="animate-pulse-soft">●</span> Uploading...
+            </span>
+          ) : (
+            <span className="flex items-center justify-center gap-2">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"
+                />
+              </svg>
+              Upload
+            </span>
+          )}
         </button>
       </div>
 
-      <div style={{ marginTop: 8, color: "#444" }}>
-        {fileName ? `Selected: ${fileName}` : "No file selected"}
+      <div className="text-gray-700 text-sm mt-4">
+        {fileName ? (
+          <span className="text-emerald-600 font-semibold flex items-center gap-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Selected: {fileName}
+          </span>
+        ) : (
+          <span className="text-gray-500 flex items-center gap-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" />
+            </svg>
+            No file selected
+          </span>
+        )}
       </div>
 
       {error && (
-        <div style={{ marginTop: 8, color: "#b00020" }}>Error: {error}</div>
+        <div className="text-red-700 text-sm font-medium bg-red-50 p-4 rounded-xl border-l-4 border-red-500 mt-4 animate-slide-in flex items-start gap-3">
+          <svg
+            className="w-5 h-5 mt-0.5 flex-shrink-0"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <span>{error}</span>
+        </div>
       )}
 
       {createdBatchId && (
-        <div style={{ marginTop: 8 }}>
-          Batch created:{" "}
-          <a href={`${API_BASE}/api/batches/${createdBatchId}/`}>
+        <div className="text-emerald-700 text-sm font-medium bg-emerald-50 p-4 rounded-xl border-l-4 border-emerald-500 mt-4 animate-slide-in">
+          <span className="flex items-center gap-2 mb-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Batch created successfully!
+          </span>
+          <a
+            href={`${API_BASE}/api/batches/${createdBatchId}/`}
+            className="text-emerald-600 hover:text-emerald-800 font-semibold underline"
+          >
             View batch #{createdBatchId}
           </a>
         </div>
