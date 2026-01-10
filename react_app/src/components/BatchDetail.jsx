@@ -160,59 +160,169 @@ export default function BatchDetail() {
   }, [id]);
 
   return (
-    <div style={{ marginTop: 20 }}>
-      <h2>Batch #{id}</h2>
-      {batch && (
-        <div style={{ marginBottom: 8 }}>
-          <strong>File:</strong> {batch.original_filename} —{" "}
-          <strong>Status:</strong> {batch.status}
-        </div>
-      )}
+    <div className="mt-8 max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="card p-6 animate-fade-in">
+        <h2 className="text-3xl sm:text-4xl font-poppins font-bold text-gray-900 mb-6 flex items-center gap-2">
+          <svg
+            className="w-6 h-6 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          Batch #{id}
+        </h2>
 
-      {error && <div style={{ color: "#b00020" }}>Error: {error}</div>}
-
-      <div style={{ marginTop: 8 }}>
-        <h3>Pending / Processing Items</h3>
-        {items.length === 0 ? (
-          <div>No pending items.</div>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse" }}>
-            <thead>
-              <tr>
-                <th
-                  style={{ textAlign: "left", borderBottom: "1px solid #eee" }}
+        {batch && (
+          <div className="card p-6 sm:p-8 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-2">
+                  Filename
+                </p>
+                <p className="text-gray-900 font-semibold text-lg truncate">
+                  {batch.original_filename}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide mb-2">
+                  Status
+                </p>
+                <div
+                  className={`badge text-sm font-bold ${
+                    batch.status === "completed"
+                      ? "badge-success"
+                      : batch.status === "processing"
+                      ? "badge-info"
+                      : "badge-warning"
+                  }`}
                 >
-                  Id
-                </th>
-                <th
-                  style={{ textAlign: "left", borderBottom: "1px solid #eee" }}
-                >
-                  Phone number
-                </th>
-                <th
-                  style={{ textAlign: "left", borderBottom: "1px solid #eee" }}
-                >
-                  amount
-                </th>
-                <th
-                  style={{ textAlign: "left", borderBottom: "1px solid #eee" }}
-                >
-                  status
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((it) => (
-                <tr key={`item-${it.row_number}-${it.id}`}>
-                  <td style={{ padding: "6px 8px" }}>{it.id}</td>
-                  <td style={{ padding: "6px 8px" }}>{it.phone}</td>
-                  <td style={{ padding: "6px 8px" }}>{it.amount}</td>
-                  <td style={{ padding: "6px 8px" }}>{it.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  <span className="inline-block w-2 h-2 rounded-full mr-2 bg-current"></span>
+                  {batch.status.charAt(0).toUpperCase() + batch.status.slice(1)}
+                </div>
+              </div>
+            </div>
+          </div>
         )}
+
+        {error && (
+          <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-6 py-4 rounded-lg mb-6 text-sm font-medium animate-slide-in flex items-start gap-3">
+            <svg
+              className="w-5 h-5 mt-0.5 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>{error}</span>
+          </div>
+        )}
+
+        <div>
+          <h3 className="text-xl sm:text-2xl font-poppins font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <svg
+              className="w-5 h-5 text-blue-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            Items
+          </h3>
+          {items.length === 0 ? (
+            <div className="card p-8 sm:p-12 text-center">
+              <svg
+                className="w-8 h-8 text-gray-300 mx-auto mb-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                />
+              </svg>
+              <p className="text-gray-500 text-lg">No pending items</p>
+            </div>
+          ) : (
+            <div className="card overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                      <th className="text-left px-3 sm:px-6 py-4 text-xs sm:text-sm font-poppins font-bold text-blue-900 uppercase tracking-wider">
+                        ID
+                      </th>
+                      <th className="text-left px-3 sm:px-6 py-4 text-xs sm:text-sm font-poppins font-bold text-blue-900 uppercase tracking-wider">
+                        Phone
+                      </th>
+                      <th className="text-left px-3 sm:px-6 py-4 text-xs sm:text-sm font-poppins font-bold text-blue-900 uppercase tracking-wider">
+                        Amount
+                      </th>
+                      <th className="text-left px-3 sm:px-6 py-4 text-xs sm:text-sm font-poppins font-bold text-blue-900 uppercase tracking-wider">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {items.map((it, idx) => (
+                      <tr
+                        key={`item-${it.row_number}-${it.id}`}
+                        className={`transition-colors duration-150 ${
+                          idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                        } hover:bg-blue-50`}
+                      >
+                        <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm text-gray-900 font-semibold">
+                          {it.id}
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm text-gray-800 font-mono tracking-tight">
+                          {it.phone}
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm text-gray-900 font-semibold">
+                          {it.amount}
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm">
+                          <span
+                            className={`badge text-xs font-bold ${
+                              it.status === "success"
+                                ? "badge-success"
+                                : it.status === "processing"
+                                ? "badge-info animate-pulse-soft"
+                                : it.status === "failed"
+                                ? "badge-danger"
+                                : "badge-warning"
+                            }`}
+                          >
+                            {it.status.charAt(0).toUpperCase() +
+                              it.status.slice(1)}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

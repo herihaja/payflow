@@ -54,24 +54,52 @@ export default function Login({ onLogin }) {
   return (
     <form
       onSubmit={submit}
-      style={{ display: "flex", gap: 8, alignItems: "center" }}
+      className="w-full sm:w-auto card p-6 sm:p-8 animate-fade-in"
     >
-      <input
-        placeholder="username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        placeholder="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button type="submit" disabled={loading} style={{ padding: "6px 12px" }}>
-        {loading ? "Signing in..." : "Sign in"}
-      </button>
+      <h3 className="text-xl font-poppins font-bold text-gray-900 mb-6 text-center">
+        Sign In
+      </h3>
+      <div className="space-y-4">
+        <div className="input-group">
+          <label htmlFor="username">Username</label>
+          <input
+            id="username"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            type="text"
+            className="w-full"
+          />
+        </div>
+        <div className="input-group">
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            placeholder="Enter your password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full gradient-button mt-6"
+        >
+          {loading ? (
+            <span className="flex items-center justify-center gap-2">
+              <span className="animate-pulse-soft">●</span> Signing in...
+            </span>
+          ) : (
+            "Sign in"
+          )}
+        </button>
+      </div>
       {error && (
-        <div style={{ color: "#b00020", marginLeft: 12 }}>Error: {error}</div>
+        <div className="text-red-600 text-sm font-medium mt-4 bg-red-50 p-4 rounded-xl border border-red-200 animate-slide-in">
+          ⚠️ {error}
+        </div>
       )}
     </form>
   );
