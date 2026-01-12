@@ -13,6 +13,14 @@ from .models import BatchUpload, BatchItem
 from .serializers import BatchUploadSerializer, BatchUploadCreateSerializer, BatchItemSerializer
 from .tasks import process_batch_item
 
+from rest_framework.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
+from django.utils.dateparse import parse_datetime
+from decimal import Decimal
+
+from .pagination import StandardResultsSetPagination
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -94,10 +102,100 @@ class BatchUploadDetailView(generics.RetrieveAPIView):
     serializer_class = BatchUploadSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
 
-
 class BatchItemListView(generics.ListAPIView):
+    """List items for a given batch with pagination and basic filtering.
+
+    Supported query params:
+      - status: exact match (pending, success, failed, ...)
+      - phone: substring match (icontains)
+      - row: exact row number
+      - min_row, max_row
+      - min_amount, max_amount
+      - processed_before, processed_after (ISO datetime)
+      - ordering: comma-separated fields (prefix with - for desc)
+    """
     serializer_class = BatchItemSerializer
+    pagination_class = StandardResultsSetPagination
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        ALLOWED_ORDERING = [
+            'id', 'row_number', 'phone', 'amount', 'status', 'processed_at'
+        ]
         batch_id = self.kwargs.get('batch_id')
-        return BatchItem.objects.filter(batch_id=batch_id)
+        # ensure batch exists and enforce simple ownership rule: only uploader or staff can view
+        batch = get_object_or_404(BatchUpload, pk=batch_id)
+        user = self.request.user
+        if batch.uploaded_by and batch.uploaded_by != user and not user.is_staff:
+            raise PermissionDenied('You do not have permission to view items for this batch')
+
+        qs = BatchItem.objects.filter(batch_id=batch_id)
+        params = self.request.query_params
+
+        status = params.get('status')
+        if status:
+            qs = qs.filter(status__iexact=status)
+
+        phone = params.get('phone')
+        if phone:
+            qs = qs.filter(phone__icontains=phone)
+
+        row = params.get('row')
+        if row:
+            try:
+                qs = qs.filter(row_number=int(row))
+            except ValueError:
+                pass
+
+        min_row = params.get('min_row')
+        if min_row:
+            try:
+                qs = qs.filter(row_number__gte=int(min_row))
+            except ValueError:
+                pass
+
+        max_row = params.get('max_row')
+        if max_row:
+            try:
+                qs = qs.filter(row_number__lte=int(max_row))
+            except ValueError:
+                pass
+
+        min_amount = params.get('min_amount')
+        if min_amount:
+            try:
+                qs = qs.filter(amount__gte=Decimal(min_amount))
+            except ValueError:
+                pass
+
+        max_amount = params.get('max_amount')
+        if max_amount:
+            try:
+                qs = qs.filter(amount__lte=Decimal(max_amount))
+            except ValueError:
+                pass
+
+        processed_before = params.get('processed_before')
+        processed_after = params.get('processed_after')
+
+        if processed_before:
+            dt = parse_datetime(processed_before)
+            if dt:
+                qs = qs.filter(processed_at__lte=dt)
+
+        if processed_after:
+            dt = parse_datetime(processed_after)
+            if dt:
+                qs = qs.filter(processed_at__gte=dt)
+
+        ordering = params.get('ordering')
+        if ordering:
+            fields = []
+            for f in ordering.split(','):
+                f = f.strip()
+                if f.lstrip('-') in ALLOWED_ORDERING:
+                    fields.append(f)
+            if fields:
+                qs = qs.order_by(*fields)
+
+        return qs

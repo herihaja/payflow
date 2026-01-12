@@ -99,9 +99,6 @@ export default function BatchUploader() {
             Batch Uploader
           </h2>
         </div>
-        <span className="bg-red-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
-          DEBUG
-        </span>
       </div>
 
       <p className="text-gray-700 text-sm mb-6 leading-relaxed">

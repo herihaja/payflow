@@ -25,7 +25,11 @@ export default function Login({ onLogin }) {
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         throw new Error(
-          data.detail || data.error || res.statusText || "Login failed"
+          data.non_field_errors ||
+            data.detail ||
+            data.error ||
+            res.statusText ||
+            "Login failed"
         );
       }
 

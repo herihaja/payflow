@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import BatchUpload, BatchItem
+from account.serializers import UserSerializer
 
 
 class BatchItemSerializer(serializers.ModelSerializer):
@@ -9,11 +10,11 @@ class BatchItemSerializer(serializers.ModelSerializer):
 
 
 class BatchUploadSerializer(serializers.ModelSerializer):
-    items = BatchItemSerializer(many=True, read_only=True)
+    uploaded_by = UserSerializer(read_only=True)
 
     class Meta:
         model = BatchUpload
-        fields = ('id', 'original_filename', 'status', 'created_at', 'total_rows', 'processed_rows', 'errors', 'items')
+        fields = ('id', 'original_filename', 'status', 'created_at', 'total_rows', 'processed_rows', 'errors', 'uploaded_by')
 
 
 class BatchUploadCreateSerializer(serializers.ModelSerializer):
